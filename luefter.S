@@ -32,7 +32,8 @@
 
 .equ STATE_OFF,		0
 .equ STATE_AUTO,	(STATE_OFF+1)
-.equ STATE_LOW,		(STATE_AUTO+1)
+.equ STATE_STARTUP,	(STATE_AUTO+1)
+.equ STATE_LOW,		(STATE_STARTUP+1)
 .equ STATE_MEDIUM,	(STATE_LOW+1)
 .equ STATE_HIGH,	(STATE_MEDIUM+1)
 .equ STATE_MAX,		STATE_HIGH
@@ -256,10 +257,15 @@ int0_wakup:
 
 int0_next_state:
 	cpi	state, STATE_MAX
-	brne	int0_inc
+	brne	int0_startup
 	ldi	state, STATE_OFF
 	wdr
 	rjmp	int0_out
+
+int0_startup:
+	cpi	state, STATE_STARTUP
+	brne	int0_inc
+	inc	state
 
 int0_inc:
 	inc	state
@@ -290,10 +296,10 @@ WDT_vect:
 	rjmp	wdt_set_pwm
 
 process_key_low:
-	cpi	state, STATE_LOW
+	cpi	state, STATE_STARTUP
 	brne	process_key_medium
 	; set fan to low speed
-	ldi	pwm, PWM_LOW
+	ldi	pwm, PWM_HIGH
 	rjmp	wdt_set_pwm
 
 process_key_medium:
@@ -309,7 +315,6 @@ process_key_high:
 	; set fan to high speed
 	ldi	pwm, PWM_HIGH
 	rjmp	wdt_set_pwm
-
 
 process_mode_auto:
 	cpi	state, STATE_AUTO
@@ -370,13 +375,21 @@ wdt_set_pwm:
 
 process_mode_selftest:
 	cpi	state, STATE_SELFTEST
-	brne	wdt_out
+	brne	process_mode_startup
 
 	; self test on start: set both fans for 4 seconds to high speed
 	dec	st_count
 	brne	wdt_out
 	; finally, go to automatic mode 
 	ldi	state, STATE_AUTO
+	rjmp	wdt_out
+
+process_mode_startup:
+	cpi	state, STATE_STARTUP
+	brne	wdt_out
+	ldi	state, STATE_LOW
+	ldi	pwm, PWM_LOW
+	rjmp	wdt_set_pwm
 
 wdt_out:
 	out	_SFR_IO_ADDR(SREG), sreg_save
