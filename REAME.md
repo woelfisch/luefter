@@ -24,22 +24,22 @@ Fans with PWM input (or even only being PWM safe) at this size and voltage are n
 
 ## Q&A
 
-1. Why assembler and not C?
+### Why assembler and not C?
 
 "Because I can." Also, the Atmel C library assumes some things (such as using the first timer for delay loops) that may get into the way.  And the linker script adds some overhead, mostly, wasting one word on the stack just to jump to main(). The program does not need much stack, in fact, only one word during interrupts. The macros will cause some code duplication, but these little controllers have plenty of flash space.
 
 From the author's point of view, writing it in C would result in quite
 similar code but won't be more readable or maintainable.
 
-2. That button press handling is weird
+### That button press handling is weird
 
 INT0 is level triggered, which makes key press events a bit annoying.  And it has to happein in an interrupt service routing, so no busy loops and moving part of the state machine to the watchdog timer interrupt service routing. 
  
-3. What's the purpose of the LED code?
+### What's the purpose of the LED code?
 
 Debugging. Each interrupt will toggle an LED that can be attached to PB3
 
-4. Isn't it a bit overengineered for the purpose?
+### Isn't it a bit overengineered for the purpose?
 
 Of course, but the first thing to fail will be the fastening for the batteries, I'm afraid. And the next thing to break are the fans - that's why it is important to keep everything detachable. The added complexity does not add significant risk of failure. 
  
