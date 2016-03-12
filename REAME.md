@@ -42,5 +42,6 @@ Debugging. Each interrupt will toggle an LED that can be attached to PB3
 ### Isn't it a bit overengineered for the purpose?
 
 Of course, but the first thing to fail will be the fastening for the batteries, I'm afraid. And the next thing to break are the fans - that's why it is important to keep everything detachable. The added complexity does not add significant risk of failure. 
- 
-The voltage regulator for the 5V is drawing at least 10 mA, this could be improved (the author forgot to order a p-channel MOSFET in time), the L239D is completely oversized for these kinds of fans (n-channel MOSFET switches would be sufficient, but the author thought he could get fans that work in both directions when he designed the circuit.) It won't be needed at all for fans with PWM input, but again, good luck finding those. The whole circuit with both fans running at full speed draws about 350 mA.  
+## About the circuit ##
+
+The voltage regulator for the 5V is drawing at least 10 mA at 6V input, this could be improved (the author forgot to order a p-channel MOSFET in time), the L293D is completely oversized for these kinds of fans (n-channel MOSFET switches would be sufficient, but the author thought he could get fans that work in both directions when he designed the circuit.) It won't be needed at all for fans with PWM input, but again, good luck finding those. Contrary to what the documentation implies, the L293D doesn't draw significant current with it's outputs being disabled. The whole circuit with both fans running at full speed draws about 350 mA. Batteries (4× fully charged 2500 mAh NiMH) last about 3 hours on full speed, and more than 7 hours on medium speed with the reference board. YMMV, obviously.
